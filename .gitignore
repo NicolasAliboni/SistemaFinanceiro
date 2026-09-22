@@ -1,0 +1,26 @@
+# Compilação
+**/bin/
+**/obj/
+
+# IDEs e configurações pessoais
+.vs/
+.idea/
+*.user
+*.suo
+
+# Testes e logs
+TestResults/
+**/logs/
+*.log
+
+# Configurações locais
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+
+# Certificados e dados privados
+*.pfx
+*.p12
+backups/
+dados-reais/
