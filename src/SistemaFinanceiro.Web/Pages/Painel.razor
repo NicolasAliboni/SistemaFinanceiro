@@ -1,10 +1,46 @@
 ﻿@page "/painel"
 @attribute [Authorize]
+@using SistemaFinanceiro.Web.Services
+@inject ApiService Api
 
 <PageTitle>Painel | Sistema Financeiro</PageTitle>
 
 <main style="max-width: 900px; margin: 4rem auto; padding: 1rem;">
     <h1>Painel financeiro</h1>
-    <p>Você está autenticado.</p>
-    <p>Os cadastros e indicadores serão implementados nas próximas etapas.</p>
+
+    <p>Teste a comunicação autenticada com a API.</p>
+
+    <button @onclick="TestarAsync" disabled="@_testando">
+        @(_testando ? "Testando..." : "Testar acesso à API")
+    </button>
+
+    @if (_resultado is not null)
+    {
+        <p role="status">@_resultado</p>
+    }
 </main>
+
+@code {
+    private bool _testando;
+    private string? _resultado;
+
+    private async Task TestarAsync()
+    {
+        if (_testando)
+        {
+            return;
+        }
+
+        _testando = true;
+        _resultado = null;
+
+        try
+        {
+            _resultado = await Api.TestarAcessoAsync();
+        }
+        finally
+        {
+            _testando = false;
+        }
+    }
+}

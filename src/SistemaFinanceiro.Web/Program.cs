@@ -59,4 +59,6 @@ builder.Services.AddScoped<
     AuthenticationStateProvider,
     SupabaseAuthenticationStateProvider>();
 
+builder.Services.AddScoped<ApiService>();
+
 await builder.Build().RunAsync();
