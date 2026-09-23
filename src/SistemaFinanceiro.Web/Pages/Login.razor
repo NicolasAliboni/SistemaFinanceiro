@@ -1,0 +1,99 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using SistemaFinanceiro.Web.Services
+@inject AuthService Auth
+@inject NavigationManager Navigation
+
+<PageTitle>Entrar | Sistema Financeiro</PageTitle>
+
+<main style="max-width: 420px; margin: 4rem auto; padding: 1rem;">
+    <h1>Entrar</h1>
+    <p>Use seu e-mail e senha do sistema financeiro.</p>
+
+    <EditForm Model="_model" OnValidSubmit="EntrarAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <fieldset disabled="@_enviando">
+            <div style="margin-bottom: 1rem;">
+                <label for="email">E-mail</label>
+                <InputText id="email"
+                           type="email"
+                           autocomplete="username"
+                           @bind-Value="_model.Email" />
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label for="senha">Senha</label>
+                <InputText id="senha"
+                           type="password"
+                           autocomplete="current-password"
+                           @bind-Value="_model.Password" />
+            </div>
+
+            <button type="submit">
+                @(_enviando ? "Entrando..." : "Entrar")
+            </button>
+        </fieldset>
+    </EditForm>
+
+    @if (_erro is not null)
+    {
+        <p role="alert" style="color: #b91c1c;">@_erro</p>
+    }
+
+    @if (_sucesso)
+    {
+        <p role="status">
+            Login realizado com sucesso.
+            A integração com as páginas protegidas será feita na próxima etapa.
+        </p>
+    }
+</main>
+
+@code {
+    private readonly LoginModel _model = new();
+    private bool _enviando;
+    private bool _sucesso;
+    private string? _erro;
+
+    private async Task EntrarAsync()
+    {
+        if (_enviando)
+        {
+            return;
+        }
+
+        _enviando = true;
+        _sucesso = false;
+        _erro = null;
+
+        try
+        {
+            _erro = await Auth.LoginAsync(
+                _model.Email,
+                _model.Password);
+
+            _sucesso = _erro is null;
+            if (_sucesso)
+            {
+                Navigation.NavigateTo("/painel");
+            }
+        }
+        finally
+        {
+            _model.Password = "";
+            _enviando = false;
+        }
+    }
+
+    public sealed class LoginModel
+    {
+        [Required(ErrorMessage = "Informe seu e-mail.")]
+        [EmailAddress(ErrorMessage = "Informe um e-mail válido.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Informe sua senha.")]
+        public string Password { get; set; } = "";
+    }
+}

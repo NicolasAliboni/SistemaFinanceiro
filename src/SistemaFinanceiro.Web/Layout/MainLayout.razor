@@ -1,3 +1,57 @@
 ﻿@inherits LayoutComponentBase
+@using SistemaFinanceiro.Web.Services
+@inject AuthService Auth
+@inject NavigationManager Navigation
+
+<header style="padding: 1rem; border-bottom: 1px solid #ddd;">
+    <a href="">Sistema Financeiro</a>
+
+    <AuthorizeView>
+        <Authorized>
+            <a href="painel" style="margin-left: 1rem;">Painel</a>
+
+            <button @onclick="SairAsync"
+                    disabled="@_saindo"
+                    style="margin-left: 1rem;">
+                @(_saindo ? "Saindo..." : "Sair")
+            </button>
+        </Authorized>
+
+        <NotAuthorized>
+            <a href="login" style="margin-left: 1rem;">Entrar</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</header>
+
+@if (_aviso is not null)
+{
+    <p role="alert" style="padding: 1rem;">@_aviso</p>
+}
 
 @Body
+
+@code {
+    private bool _saindo;
+    private string? _aviso;
+
+    private async Task SairAsync()
+    {
+        if (_saindo)
+        {
+            return;
+        }
+
+        _saindo = true;
+        _aviso = null;
+
+        try
+        {
+            _aviso = await Auth.LogoutAsync();
+            Navigation.NavigateTo("/login");
+        }
+        finally
+        {
+            _saindo = false;
+        }
+    }
+}
